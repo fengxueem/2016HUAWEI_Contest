@@ -16,10 +16,6 @@ public class Graph {
 
 	}
 
-	/*private void addVertices(Vertices vertice) {
-		verticesMap.add(vertice);
-	}*/
-
 	// Setters and getters
 
 	public void setVerticesMap(HashMap<String, Vertices> verticesMap) {

@@ -22,12 +22,10 @@ public final class Route
     /**
      * 你需要完成功能的入口
      * 
-     * @author XXX
-     * @since 2016-3-4
+     * @author Terry, Jing, Mark
+     * @since 2016-4-9
      * @version V1
      */
-
-    
 
     public static String searchRoute(String graphContent, String condition)
     {	
@@ -44,15 +42,15 @@ public final class Route
         int numOfPassPoints; 
         Queue<Vertices> frontierList = new LinkedList<Vertices>();
         Vertices currentPoint;
+        Edge currentEdge = null;
         Walk currentWalk;
         Walk outcomeWalk = null;
         List<String> historyVertices = new ArrayList<String>();
+        List<Edge> historyEdge = new ArrayList<Edge>();
         // Vertices[] childs;
         Queue<Walk>  walkList= new LinkedList<Walk>();
         Queue<Walk>  walkList1= new LinkedList<Walk>();        
         List<Walk> childWalks;
-
-
 
        	// generate start point, end point and passing points
         condition = condition.replace('\n',',');
@@ -69,34 +67,34 @@ public final class Route
           }
        	}
 
-       	for (int i = 0;i < passPoints.size() ;i++ ) {
-       		System.out.println("Pass point #:"+i+" "+passPoints.get(i));
-          System.out.println(passPoints.get(i));
-       	}
+       	// for (int i = 0;i < passPoints.size() ;i++ ) {
+       	// 	System.out.println("Pass point #:"+i+" "+passPoints.get(i));
+        //   System.out.println(passPoints.get(i));
+       	// }
        	
        	// generate edgeList
       	String[] topoContent = graphContent.split(System.getProperty("line.separator"));//read topo file
       	for (int k =0; k < topoContent.length; k++) {
           String v = topoContent[k];
           String[] vContent = v.split (",");//four elems in vCont,1st line, 2nd source,3rd:target,4th weight
-		  	Edge edge = new Edge(vContent[0], vContent[1] , vContent[2], Integer.parseInt(vContent[3]));
-		  	if (edgeList.isEmpty()) {
-		  		edgeList.add(edge);
-		  	} else {
-		 		// handle repeated edge
-				Boolean found = false; // flag of finding repeated edge
-				for (int j = 0;j < edgeList.size() ;j++ ) {
-					Edge tempEdge = edgeList.get(j);
-					if (tempEdge.getSource().equals(edge.getSource()) && tempEdge.getDestination().equals(edge.getDestination()) && tempEdge.getWeight()>edge.getWeight()) {
-						edgeList.get(j).setWeight(edge.getWeight());
-						found = true; // found the repeated edge
-						break; // found the repeated edge and updated new weight, then jump out of the loop
-					}
-				}
-				if (!found) { // if no repeated edge, then add this edge
-					edgeList.add(edge);
-				}
-			}
+          Edge edge = new Edge(vContent[0], vContent[1] , vContent[2], Integer.parseInt(vContent[3]));
+          if (edgeList.isEmpty()) {
+		  		  edgeList.add(edge);
+          } else {
+            // handle repeated edge
+				    Boolean found = false; // flag of finding repeated edge
+				    for (int j = 0;j < edgeList.size() ;j++ ) {
+              Edge tempEdge = edgeList.get(j);
+              if (tempEdge.getSource().equals(edge.getSource()) && tempEdge.getDestination().equals(edge.getDestination()) && tempEdge.getWeight()>edge.getWeight()) {
+                edgeList.get(j).setWeight(edge.getWeight());
+						    found = true; // found the repeated edge
+						    break; // found the repeated edge and updated new weight, then jump out of the loop
+              }
+				    }
+				    if (!found) { // if no repeated edge, then add this edge
+              edgeList.add(edge);
+				    }
+          }
        	}
        	graph.setEdgeList(edgeList);
 
@@ -119,27 +117,24 @@ public final class Route
        		}
        	}
        	graph.setVerticesMap(verticesMap);
-		    for (Iterator iter = verticesMap.values().iterator(); iter.hasNext();) {
-		    	Vertices v = (Vertices)iter.next();
-		    	System.out.println("Vertice: "+ v.getId()+" outDegree size:"+v.getOutDegreeList().size());
-		    }
 
-        if (passPoints.contains(3)) {
-          System.out.println("We have 3!");
-        }
+		    // for (Iterator iter = verticesMap.values().iterator(); iter.hasNext();) {
+		    // 	Vertices v = (Vertices)iter.next();
+		    // 	System.out.println("Vertice: "+ v.getId()+" outDegree size:"+v.getOutDegreeList().size());
+		    // }
        	//BFS
        	numOfPassPoints = passPoints.size();
        	currentPoint = graph.findVertice(startPoint);// find start point
        	currentPoint.setIsVisited(true);
-       	currentWalk = new Walk(currentPoint, historyVertices, 0);
+       	currentWalk = new Walk(currentPoint,currentEdge,historyVertices,historyEdge,0);
        	frontierList.offer(currentPoint);//put the start point at the tail of queue
        	walkList.offer(currentWalk);
        	while (!frontierList.isEmpty()){// loop while the queue is not empty
        		currentPoint = frontierList.poll(); // get current expended point and remove it from queue
-       		currentPoint.setIsVisited(true);
+       		// currentPoint.setIsVisited(true);
        		currentWalk = walkList.poll(); // get corresponing walk to this point and remove it from queue
-          System.out.println("Current Point"+currentPoint.getId());
-       		childWalks = childWalkGener(currentPoint,currentWalk,graph.getVerticesMap(),passPoints);
+          // System.out.println("Current Point"+currentPoint.getId());
+       		childWalks = childWalkGener(currentPoint,currentWalk,graph,passPoints);
        		if (childWalks == null) {
        			continue;
        		}
@@ -151,13 +146,13 @@ public final class Route
               }
               continue;
             }
-       			walkList.offer(childWalks.get(j));
-       			frontierList.offer(childWalks.get(j).getFrontier());// push new childs' walks at the tail of queue
+       			walkList.offer(childWalks.get(j));// push new childs' walks at the tail of queue
+       			frontierList.offer(childWalks.get(j).getFrontier());
        		}
        	}
       	
       	// find the best walk
-      	int min = -1;
+      	int min = -1; // since -1 is never gonna be the path length
       	for (Iterator iter = walkList1.iterator(); iter.hasNext();) {
 			    Walk walk = (Walk)iter.next();
 				  if (min == -1) {
@@ -180,7 +175,7 @@ public final class Route
 		return output(outcomeWalk);
     }
 
-    public static Vertices getSrcVertFromEdge (Edge edge) {    
+    public static Vertices getSrcVertFromEdge(Edge edge) {    
         Vertices v = new Vertices();
         v.setId(edge.getSource());
         List<Edge> l = new ArrayList<Edge>();
@@ -189,7 +184,7 @@ public final class Route
         return v;
     } 
 
-    public static Vertices getDesVertFromEdge (Edge edge) {    
+    public static Vertices getDesVertFromEdge(Edge edge) {    
         Vertices v = new Vertices();
         v.setId(edge.getDestination());
         List<Edge> l = new ArrayList<Edge>();
@@ -197,27 +192,35 @@ public final class Route
         return v;
     } 
 
-    public static List<Walk> childWalkGener(Vertices frontier, Walk oldWalk, HashMap<String, Vertices>  verticesMap, List<String> passPoints) {
+    public static List<Walk> childWalkGener(Vertices frontier, Walk oldWalk, Graph graph, List<String> passPoints) {
         List<Walk> childWalks = new ArrayList<Walk>();
         List<Edge> childEdges = frontier.getOutDegreeList();
         if (!childEdges.isEmpty()) {
             for (int i = 0; i < childEdges.size(); i++ ) {
                 String targetId = childEdges.get(i).getDestination();
-                Vertices d = verticesMap.get(targetId); 
+                Vertices d = graph.getVerticesMap().get(targetId); 
                 if (!oldWalk.getHistoryVertices().contains(targetId)) {
                     Walk w = new Walk();
                     List<String> history = new ArrayList<String>();
+                    List<Edge> historyE = new ArrayList<Edge>();
                     for (int q = 0;q < oldWalk.getHistoryVertices().size() ;q++ ) {
-                      history.add(oldWalk.getHistoryVertices().get(q)); 
+                      history.add(oldWalk.getHistoryVertices().get(q));
+                    }
+                    for (int q = 0;q < oldWalk.getHistoryEdge().size() ;q++ ) {
+                      historyE.add(oldWalk.getHistoryEdge().get(q));
                     }
                     history.add(frontier.getId());//put current frontier into history
+                    if (oldWalk.getFrontierEdge() != null) {
+                      historyE.add(oldWalk.getFrontierEdge());
+                    }
                     w.setHistoryVertices( history );
+                    w.setHistoryEdge(historyE);
                     if (passPoints.contains(frontier.getId())) {
                         w.setCounter( oldWalk.getCounter() + 1 );
                     }
-                    int tempLength = oldWalk.getLength();
-                    w.setLength( tempLength + childEdges.get(i).getWeight() );
+                    w.setLength( oldWalk.getLength() + childEdges.get(i).getWeight() );
                     w.setFrontier(d);
+                    w.setFrontierEdge(childEdges.get(i));
                     childWalks.add(w);
                 }// if childs[i] has been visited
             }
@@ -231,11 +234,11 @@ public final class Route
     	if (outcomeWalk == null) {
     		return "NA";
     	} else {
-    		for (int i = 0;i < outcomeWalk.getHistoryVertices().size() ;i++ ) {
-    			out = out.concat(outcomeWalk.getHistoryVertices().get(i));
+    		for (int i = 0;i < outcomeWalk.getHistoryEdge().size() ;i++ ) {
+    			out = out.concat(outcomeWalk.getHistoryEdge().get(i).getId());
     			out = out.concat("|");
     		}
-    		out = out.concat(outcomeWalk.getFrontier().getId());
+    		out = out.concat(outcomeWalk.getFrontierEdge().getId());
     		return out;
     	}
     }

@@ -31,19 +31,4 @@ public class Vertices {
 	public boolean getIsVisited() {
 		return isVisited;
 	}
-
-	// const
-
-	public String findNN() {
-		int min = 21; // the max weight is 21
-		String nnId = null;
-		for (int i = 0;i < outDegreeList.size() ;i++ ) {
-			int temp = outDegreeList.get(i).getWeight();
-			if (temp < min) {
-				min = temp;
-				nnId = outDegreeList.get(i).getId();
-			}
-		}
-		return nnId;
-	}
 }

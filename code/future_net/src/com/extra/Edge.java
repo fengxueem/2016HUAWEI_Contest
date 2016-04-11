@@ -8,8 +8,6 @@ public class Edge {
 	private String destination;
 	private int weight;
 
-
-
 	// Constructor
 	public Edge(String id, String source , String destination, int weight){
 		this.id = id;
