@@ -30,9 +30,9 @@ public final class Route
     public static String searchRoute(String graphContent, String condition)
     {	
     	// Graph variables
-    	  String startPoint;
-    	  String endPoint;
-    	  String outcomePath;
+    	String startPoint;
+    	String endPoint;
+    	String outcomePath;
         List<String> passPoints = new ArrayList<String>();
         List<Edge> edgeList = new ArrayList<Edge>();
         HashMap<String, Vertices>  verticesMap = new HashMap<String, Vertices>();
@@ -75,26 +75,26 @@ public final class Route
        	// generate edgeList
       	String[] topoContent = graphContent.split(System.getProperty("line.separator"));//read topo file
       	for (int k =0; k < topoContent.length; k++) {
-          String v = topoContent[k];
-          String[] vContent = v.split (",");//four elems in vCont,1st line, 2nd source,3rd:target,4th weight
-          Edge edge = new Edge(vContent[0], vContent[1] , vContent[2], Integer.parseInt(vContent[3]));
-          if (edgeList.isEmpty()) {
-		  		  edgeList.add(edge);
-          } else {
+        	String v = topoContent[k];
+        	String[] vContent = v.split (",");//four elems in vCont,1st line, 2nd source,3rd:target,4th weight
+        	Edge edge = new Edge(vContent[0], vContent[1] , vContent[2], Integer.parseInt(vContent[3]));
+        	if (edgeList.isEmpty()) {
+		  		edgeList.add(edge);
+        	} else {
             // handle repeated edge
-				    Boolean found = false; // flag of finding repeated edge
-				    for (int j = 0;j < edgeList.size() ;j++ ) {
-              Edge tempEdge = edgeList.get(j);
-              if (tempEdge.getSource().equals(edge.getSource()) && tempEdge.getDestination().equals(edge.getDestination()) && tempEdge.getWeight()>edge.getWeight()) {
-                edgeList.get(j).setWeight(edge.getWeight());
-						    found = true; // found the repeated edge
-						    break; // found the repeated edge and updated new weight, then jump out of the loop
-              }
-				    }
-				    if (!found) { // if no repeated edge, then add this edge
-              edgeList.add(edge);
-				    }
-          }
+				Boolean found = false; // flag of finding repeated edge
+			    for (int j = 0;j < edgeList.size() ;j++ ) {
+        			Edge tempEdge = edgeList.get(j);
+            		if (tempEdge.getSource().equals(edge.getSource()) && tempEdge.getDestination().equals(edge.getDestination()) && tempEdge.getWeight()>edge.getWeight()) {
+                		edgeList.get(j).setWeight(edge.getWeight());
+						found = true; // found the repeated edge
+						break; // found the repeated edge and updated new weight, then jump out of the loop
+              		}
+				}
+				if (!found) { // if no repeated edge, then add this edge
+            		edgeList.add(edge);
+				}
+        	}
        	}
        	graph.setEdgeList(edgeList);
 
@@ -133,7 +133,7 @@ public final class Route
        		currentPoint = frontierList.poll(); // get current expended point and remove it from queue
        		// currentPoint.setIsVisited(true);
        		currentWalk = walkList.poll(); // get corresponing walk to this point and remove it from queue
-          // System.out.println("Current Point"+currentPoint.getId());
+        	// System.out.println("Current Point"+currentPoint.getId());
        		childWalks = childWalkGener(currentPoint,currentWalk,graph,passPoints);
        		if (childWalks == null) {
        			continue;
@@ -141,10 +141,10 @@ public final class Route
        		for (int j = 0;j < childWalks.size() ;j++ ) {
             // childWalks.get(j).printWalk();
             if (childWalks.get(j).getFrontier().getId().equals(endPoint)) {
-              if (childWalks.get(j).getCounter() == numOfPassPoints) {
-                walkList1.offer(childWalks.get(j));
-              }
-              continue;
+            	if (childWalks.get(j).getCounter() == numOfPassPoints) {
+            		walkList1.offer(childWalks.get(j));
+            	}
+              	continue;
             }
        			walkList.offer(childWalks.get(j));// push new childs' walks at the tail of queue
        			frontierList.offer(childWalks.get(j).getFrontier());
@@ -154,15 +154,15 @@ public final class Route
       	// find the best walk
       	int min = -1; // since -1 is never gonna be the path length
       	for (Iterator iter = walkList1.iterator(); iter.hasNext();) {
-			    Walk walk = (Walk)iter.next();
-				  if (min == -1) {
-					 min = walk.getLength();
-					 outcomeWalk = walk;
-				  } else if(walk.getLength() < min){
-					 min = walk.getLength();
-					 outcomeWalk = walk;
-				  }
-		    }
+			Walk walk = (Walk)iter.next();
+			if (min == -1) {
+				min = walk.getLength();
+				outcomeWalk = walk;
+			} else if(walk.getLength() < min){
+				min = walk.getLength();
+				outcomeWalk = walk;
+			}
+		}
         // System.out.println("This is outcome walk.");
         // // A stupid way to output final result......hehe
         // System.out.println("Final results:");
