@@ -40,7 +40,7 @@ public final class Route
 
         // BFS alg. variables
         int numOfPassPoints; 
-        Queue<Vertices> frontierList = new LinkedList<Vertices>();
+        LinkedList<Vertices> frontierList = new LinkedList<Vertices>();
         Vertices currentPoint;
         Edge currentEdge = null;
         Walk currentWalk;
@@ -48,8 +48,8 @@ public final class Route
         List<String> historyVertices = new ArrayList<String>();
         List<Edge> historyEdge = new ArrayList<Edge>();
         // Vertices[] childs;
-        Queue<Walk>  walkList= new LinkedList<Walk>();
-        Queue<Walk>  walkList1= new LinkedList<Walk>();        
+        LinkedList<Walk>  walkList= new LinkedList<Walk>();
+        LinkedList<Walk>  walkList1= new LinkedList<Walk>();        
         List<Walk> childWalks;
 
        	// generate start point, end point and passing points
@@ -60,7 +60,7 @@ public final class Route
        	for (int i =0; i <demand.length; i++) {
        		if(i!=0 && i!=1 && i!=demand.length-1) {
        			String v=demand[i];
-				    passPoints.add(v);
+				passPoints.add(v);
        		} else if (i==demand.length-1) {
             String v=demand[i];
             passPoints.add(v);
@@ -122,14 +122,14 @@ public final class Route
 		    // 	Vertices v = (Vertices)iter.next();
 		    // 	System.out.println("Vertice: "+ v.getId()+" outDegree size:"+v.getOutDegreeList().size());
 		    // }
-       	//BFS
+       	//DFS
        	numOfPassPoints = passPoints.size();
        	currentPoint = graph.findVertice(startPoint);// find start point
        	currentPoint.setIsVisited(true);
        	currentWalk = new Walk(currentPoint,currentEdge,historyVertices,historyEdge,0);
        	frontierList.offer(currentPoint);//put the start point at the tail of queue
        	walkList.offer(currentWalk);
-       	while (!frontierList.isEmpty()){// loop while the queue is not empty
+       	while (!frontierList.isEmpty()&&walkList1.isEmpty()){// loop while the queue is not empty
        		currentPoint = frontierList.poll(); // get current expended point and remove it from queue
        		// currentPoint.setIsVisited(true);
        		currentWalk = walkList.poll(); // get corresponing walk to this point and remove it from queue
@@ -140,14 +140,19 @@ public final class Route
        		}
        		for (int j = 0;j < childWalks.size() ;j++ ) {
             // childWalks.get(j).printWalk();
-            if (childWalks.get(j).getFrontier().getId().equals(endPoint)) {
-            	if (childWalks.get(j).getCounter() == numOfPassPoints) {
-            		walkList1.offer(childWalks.get(j));
-            	}
-              	continue;
-            }
-       			walkList.offer(childWalks.get(j));// push new childs' walks at the tail of queue
-       			frontierList.offer(childWalks.get(j).getFrontier());
+            	if (childWalks.get(j).getFrontier().getId().equals(endPoint)) {
+            		if (childWalks.get(j).getCounter() == numOfPassPoints) {
+            			walkList1.offer(childWalks.get(j));
+            		}
+            	  	continue;
+           		}
+           		if (j == 0) {
+           			walkList.addFirst(childWalks.get(j));
+           			frontierList.addFirst(childWalks.get(j).getFrontier());
+           		} else {
+	       			walkList.offer(childWalks.get(j));// push new childs' walks at the tail of queue
+    	   			frontierList.offer(childWalks.get(j).getFrontier());
+           		}
        		}
        	}
       	
@@ -234,11 +239,11 @@ public final class Route
     	if (outcomeWalk == null) {
     		return "NA";
     	} else {
-    		for (int i = 0;i < outcomeWalk.getHistoryEdge().size() ;i++ ) {
-    			out = out.concat(outcomeWalk.getHistoryEdge().get(i).getId());
+    		for (int i = 0;i < outcomeWalk.getHistoryVertices().size() ;i++ ) {
+    			out = out.concat(outcomeWalk.getHistoryVertices().get(i));
     			out = out.concat("|");
     		}
-    		out = out.concat(outcomeWalk.getFrontierEdge().getId());
+    		out = out.concat(outcomeWalk.getFrontier().getId());
     		return out;
     	}
     }
