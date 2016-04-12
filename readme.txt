@@ -7,7 +7,7 @@
 	Linux环境：		root> sh startup.sh /xxx/topo.csv /xxx/demand.csv /xxx/result.csv
 	(说明：topo.csv和demand.csv是输入文件，result.csv是输出文件)
   4)将future_net.jar与代码打包压缩到同一个压缩包下，压缩包格式为tar.gz，即可上传答案。要求future_net.jar在压缩包中不得放到文件夹内，如下路径结构所示。
-  futrue_net.tat.gz
+  futrue_net.tar.gz
     └── future_net.jar
     └── code/
 
@@ -28,7 +28,8 @@
 └── readme.txt                  你正在看的文件 -_-" 这不用介绍了吧
 	注意：
 	1)如果增加了源文件需要修改makelist.txt文件；
-	2)如果运行时提示startup.sh文件第14行错误，请按照你本地系统情况修改此行，此脚本只是用来方便调用，修改后不会影响在判题平台的判题。
+	2)如果运行时提示
+startup.sh文件第14行错误，请按照你本地系统情况修改此行，此脚本只是用来方便调用，修改后不会影响在判题平台的判题。
 
 3、SDK代码说明：
   我们已经提供了保姆式的服务，你只需要做：
